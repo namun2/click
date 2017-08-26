@@ -10,6 +10,10 @@ import TargetedMail from './TargetedMail';
 @observer
 export default class Overview extends Component {
 
+  static PropTypes = {
+    addNotification: React.PropTypes.func.isRequired,
+  }
+
   state = {
     open: false,
     completed: 0,
@@ -46,6 +50,7 @@ export default class Overview extends Component {
     render () {
       const duration = Store.duration;
       const progress = Store.getTargetedMailProgress();
+      console.log("inprogress", Store.getTargetedMailInProgress());
          return (
              <div>
               <div style={{ color:'white', paddingTop:'4rem', fontSize:'8rem' }}>
@@ -68,11 +73,11 @@ export default class Overview extends Component {
               </div>
               <div style= {{ width: '80%', margin: 'auto', paddingTop: '4rem' }}>
                   <RaisedButton label="Send Targeted Mail" primary={true} onTouchTap={this.handleOpen} />
-                  <TargetedMail open={this.state.open} close={this.handleClose} />
+                  <TargetedMail open={this.state.open} close={this.handleClose} addNotification={this.props.addNotification} />
               </div>
               <div style={{ width: '80%', margin: 'auto' }}>
                 <LinearProgress mode="determinate" value={progress} style={{ marginTop: '2rem' }} />
-                <p style={{ fontSize:'2rem', color:'white', lineHeight: '0' }}>{duration == null ? '' : (duration - duration * progress * 0.01).toFixed(1) + 's'}</p>
+                <p style={{ fontSize:'2rem', color:'white', lineHeight: '0' }}>{!Store.getTargetedMailInProgress() || duration == null ? '' : (duration - duration * progress * 0.01).toFixed(1) + 's'}</p>
               </div>
             </div>
          );

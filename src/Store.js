@@ -31,18 +31,37 @@ class Store {
     @observable targetedMailInProgress = false;
     @observable targetedMailDuration = 0;
 
+    @observable targetedMailChosenTheme = 0;
+    @observable TargetedMailChosenAgeGroup = 0;
+
     @observable themes = [
         {
             name: 'Investment Opportunity',
             available: true,
+            preferedAgeGroup: '31~40',
+            max: 500,
+            min: 400,
         },
         {
             name: 'Bank Interest',
             available: true,
+            preferedAgeGroup: '40+',
+            max: 600,
+            min: 400,
         },
         {
             name: 'Gold',
-            available: false,    
+            available: false,
+            preferedAgeGroup: '50+',
+            max: 1000,
+            min: 600,
+        },
+        {
+            name: 'Hacked Social Media Account',
+            available: false,
+            preferedAgeGroup: '10~20',
+            max: 12000,
+            min: 8000,
         },
     ];
 
@@ -65,7 +84,7 @@ class Store {
         },
     ];
 
-    @observable durations = [90, 10, 270, 360, 450, 540, 630, 720, 810, 900, 990];
+    @observable durations = [90, 180, 270, 360, 450, 540, 630, 720, 810, 900, 990];
     @observable duration = null;
 
     @observable targetedMailStepIndex = 0;
@@ -115,6 +134,24 @@ class Store {
 
     getTargetedMailFinished = () => {
         return this.targetedMailFinished;
+    }
+
+    getTargetedMailChosenTheme = () => {
+        return this.targetedMailChosenTheme;
+    }
+
+    getTargetedMailChosenAgeGroup = () => {
+        return this.TargetedMailChosenAgeGroup;
+    }
+
+    @action
+    setTargetedMailChosenTheme = (theme) => {
+        this.targetedMailChosenTheme = theme;
+    }
+
+    @action
+    setTargetedMailChosenAgeGroup = (ageGroup) => {
+        this.TargetedMailChosenAgeGroup = ageGroup;
     }
 
     @action
@@ -275,6 +312,31 @@ class Store {
             }
         }
         return number;
+    }
+
+    @action
+    addMoneyFromTargetedMail = (slider) => {
+
+        const ageGroup = this.ageGroups[this.TargetedMailChosenAgeGroup].name;
+        const theme = this.themes[this.targetedMailChosenTheme];
+        let profit = 0;
+        let message = "You have earned $";
+
+        console.log("WHAT YOU GOT", slider);
+        console.log(this.themes[this.targetedMailChosenTheme].preferedAgeGroup, this.ageGroups[this.TargetedMailChosenAgeGroup].name);
+
+        if (theme.preferedAgeGroup === ageGroup) {
+            console.log("CORRECT");
+            profit = ((Math.random() * (theme.max - theme.min) + theme.min) * Math.pow(1.2, slider) * slider).toFixed(2);
+            message = message + profit + " from targeted mails! It seems like your customers loved your mails.";
+        } else {
+            profit = ((Math.random() * (theme.max - theme.min) + theme.min) * Math.pow(1.1, slider) * slider).toFixed(2);
+            message = message + profit + " from targeted mails!";
+        }
+
+        this.addValue({money: parseFloat(profit), caughtProb: 0});
+
+        return message;
     }
 
     sleep = (time) => {

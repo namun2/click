@@ -23,6 +23,7 @@ export default class TargetedMail extends Component {
     static PropTypes = {
         open: React.PropTypes.bool.isRequired,
         close: React.PropTypes.func.isRequired,
+        addNotification: React.PropTypes.func.isRequired,
     }
 
     state = {
@@ -47,6 +48,8 @@ export default class TargetedMail extends Component {
           Store.setDuration(null);
           Store.setTargetedMailStepIndex(0);
           Store.setTargetedMailProgress(0);
+          const message = Store.addMoneyFromTargetedMail(this.state.slider / 10);
+          this.props.addNotification(message);
           workerTimer.clearInterval(intervalId);
         }
       }, 100);
@@ -63,7 +66,7 @@ export default class TargetedMail extends Component {
         items.push(<MenuItem value={i} key={i} primaryText={theme.name} disabled={!theme.available} />);
       });
         const themes =      
-         <DropDownMenu maxHeight={300} value={this.state.value} onChange={this.handleChange}>
+         <DropDownMenu maxHeight={300} value={Store.getTargetedMailChosenTheme()} onChange={this.handleChangeTheme}>
             {items}
          </DropDownMenu>;
       return themes;
@@ -74,7 +77,7 @@ export default class TargetedMail extends Component {
         ageArray.push(<MenuItem value={i} key={i} primaryText={ageGroup.name} disabled={!ageGroup.available} />);
       });
         const ageGroups =      
-         <DropDownMenu maxHeight={300} value={this.state.value} onChange={this.handleChange}>
+         <DropDownMenu maxHeight={300} value={Store.getTargetedMailChosenAgeGroup()} onChange={this.handleChangeAgeGroup}>
             {ageArray}
          </DropDownMenu>;
       return ageGroups;
@@ -102,7 +105,13 @@ export default class TargetedMail extends Component {
     Store.setTargetedMailStepIndex(Store.getTargetedMailStepIndex() - 1);
   };
 
-   handleChange = (event, index, value) => this.setState({value});
+   handleChangeTheme = (event, index, value) => {
+      Store.setTargetedMailChosenTheme(value);
+   }
+
+    handleChangeAgeGroup = (event, index, value) => {
+      Store.setTargetedMailChosenAgeGroup(value);
+   }
 
     render () {
       const stepIndex = Store.getTargetedMailStepIndex();
